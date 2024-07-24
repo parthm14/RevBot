@@ -1,0 +1,56 @@
+BUILDING DOCKER IMAGE
+
+(base) arnavjain@Arnavs-Macbook-Air aws % docker build --platform linux/amd64 -t my-training-image .
+
+[+] Building 2.6s (10/10) FINISHED                                                                                                                                                     docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                                                                                                                                   0.0s
+ => => transferring dockerfile: 1.24kB                                                                                                                                                                 0.0s
+ => [internal] load metadata for docker.io/library/python:3.8-slim                                                                                                                                     2.1s
+ => [internal] load .dockerignore                                                                                                                                                                      0.0s
+ => => transferring context: 2B                                                                                                                                                                        0.0s
+ => [1/5] FROM docker.io/library/python:3.8-slim@sha256:463e5f5018b45cc2621ec7308df9ecaaf87deaf8fd88b28502659adf24b1662a                                                                               0.0s
+ => [internal] load build context                                                                                                                                                                      0.0s
+ => => transferring context: 3.70kB                                                                                                                                                                    0.0s
+ => CACHED [2/5] RUN pip install --upgrade pip                                                                                                                                                         0.0s
+ => CACHED [3/5] RUN pip install boto3 sagemaker pandas scikit-learn joblib imbalanced-learn                                                                                                           0.0s
+ => [4/5] COPY train.py /opt/ml/code/train.py                                                                                                                                                          0.0s
+ => [5/5] RUN chmod +x /opt/ml/code/train.py                                                                                                                                                           0.3s
+ => exporting to image                                                                                                                                                                                 0.0s
+ => => exporting layers                                                                                                                                                                                0.0s
+ => => writing image sha256:a60035c091b1848ddfa123a65580da658ee125f42eba4b79bc7f39c42a376e74                                                                                                           0.0s
+ => => naming to docker.io/library/my-training-image                                                                                                                                                   0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/xme924d2whmua9eybur73uyho
+
+What's next:
+    View a summary of image vulnerabilities and recommendations → docker scout quickview 
+
+-------------------------------------------------------------------------------------------------------------------------------------
+ECR LOGIN
+
+(base) arnavjain@Arnavs-Macbook-Air aws % aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 580905162163.dkr.ecr.ap-south-1.amazonaws.com
+
+Login Succeeded
+
+-------------------------------------------------------------------------------------------------------------------------------------
+DOCKER TAG AND PUSH TO ECR
+
+(base) arnavjain@Arnavs-Macbook-Air aws % docker tag my-training-image:latest 580905162163.dkr.ecr.ap-south-1.amazonaws.com/my-training-image:latest
+
+(base) arnavjain@Arnavs-Macbook-Air aws % docker push 580905162163.dkr.ecr.ap-south-1.amazonaws.com/my-training-image:latest
+
+The push refers to repository [580905162163.dkr.ecr.ap-south-1.amazonaws.com/my-training-image]
+486c40afc1d8: Pushed 
+df0f2f159fb9: Pushed 
+3c57b2a44574: Layer already exists 
+d2dd9d4a6526: Layer already exists 
+8b81fa4c988f: Layer already exists 
+38d395ab1f6c: Layer already exists 
+fda4aa6f33af: Layer already exists 
+a696d13c7344: Layer already exists 
+32148f9f6c5a: Layer already exists 
+latest: digest: sha256:17945ed2ad055f43b86a7e85ac2d2ab32e7abd31e8ea59cc45bb8d7ba7dcc010 size: 2210
+
+-------------------------------------------------------------------------------------------------------------------------------------
+PUSHED SUCCESSFULLY, IS VISIBLE ON PRIVATE REPOSITORIES ON AWS.
+
