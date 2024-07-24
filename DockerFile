@@ -1,20 +1,13 @@
 DOCKERFILE CODE
 
-# Use an official Python runtime as a parent image
 FROM --platform=linux/amd64 python:3.8-slim
-
-# Install necessary packages
 RUN pip install --upgrade pip
 RUN pip install boto3 sagemaker pandas scikit-learn joblib imbalanced-learn
 
-# Set up the environment
 ENV PATH="/opt/ml/code:${PATH}"
 
-# Copy the training script into the container
 COPY train.py /opt/ml/code/train.py
 
-# Make the training script executable
 RUN chmod +x /opt/ml/code/train.py
 
-# Define the entry point for the container
 ENTRYPOINT ["python", "/opt/ml/code/train.py"]
