@@ -1,1 +1,54 @@
+!pip install langchain
+!pip install openai
+!pip install PyPDF2
+!pip install faiss-cpu
+!pip install tiktoken
+     
+from PyPDF2 import PdfReader
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.vectorstores import FAISS
+     
+import os
+os.environ["OPENAI_API_KEY"] = "key"
+     
+pdfreader = PdfReader('IBM standard purchase order terms and conditions.pdf')
+     
+from typing_extensions import Concatenate
+# read text from pdf
+raw_text = ''
+for i, page in enumerate(pdfreader.pages):
+    content = page.extract_text()
+    if content:
+        raw_text += content + '/n'
+     
 
+raw_text
+
+text_splitter = CharacterTextSplitter(
+    separator = "\n",
+    chunk_size = 1000,
+    chunk_overlap  = 400,
+    length_function = len,
+)
+texts = text_splitter.split_text(raw_text)
+     
+len(texts)
+
+!pip install --upgrade openai
+!pip install pydantic==1.10.7
+from langchain.embeddings import OpenAIEmbeddings     
+embeddings = OpenAIEmbeddings()
+     
+document_search = FAISS.from_texts(texts, embeddings)
+     
+document_search
+
+from langchain.chains.question_answering import load_qa_chain
+from langchain.llms import OpenAI
+     
+chain = load_qa_chain(OpenAI(), chain_type="stuff")
+     
+query = "What are the terms and conditions related to the payment and acceptance of products or services under the IBM standard purchase order?"
+docs = document_search.similarity_search(query)
+chain.run(input_documents=docs, question=query)
