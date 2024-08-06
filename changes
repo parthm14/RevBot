@@ -4,4 +4,4 @@ Changes to be made:
 3. Multiple documents at once 
 4. Only show response and question once instead of twice 
 5. Add Sidebar conversational memory for different chats 
-6. 
+6. When asking first question " Ask me a question", then moving to next question the bot should ask , "Ask me another question'
